@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { Speedometer, useDemoSpeed } from "@/features/speedometer/Speedometer";
-import { Compass, useDemoHeading } from "@/features/compass/Compass";
+import { Compass } from "@/features/compass/Compass";
 import { MiniMap } from "@/features/maps/MiniMap";
 import { SpotifyPlayer } from "@/features/spotify/SpotifyPlayer";
 import { TopBar } from "@/features/dashboard/TopBar";
 import { RideStats } from "@/features/dashboard/RideStats";
+import { useDeviceHeading } from "@/lib/sensors";
 
 
 export const Route = createFileRoute("/")({
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/")({
 
 function Dashboard() {
   const speed = useDemoSpeed();
-  const heading = useDemoHeading();
+  const { heading, permission, enable } = useDeviceHeading();
 
   return (
     <div className="h-screen w-screen p-3 flex flex-col gap-3 overflow-hidden">
@@ -63,8 +64,26 @@ function Dashboard() {
           initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
           className="col-span-3 row-span-4 flex flex-col gap-3 min-h-0"
         >
-          <div className="glass-strong rounded-3xl p-3 flex-1 flex flex-col items-center justify-center relative">
-            <Compass heading={heading} />
+          <div className="glass-strong rounded-3xl p-3 flex-1 flex flex-col items-center justify-center relative overflow-hidden">
+            <Compass heading={heading ?? 0} />
+            {(permission === "unknown" || permission === "denied") && (
+              <button
+                onClick={enable}
+                className="absolute inset-0 rounded-3xl grid place-items-center bg-black/60 backdrop-blur-sm text-center px-4"
+              >
+                <div>
+                  <div className="font-display text-xs tracking-[0.3em] text-white/90">
+                    ENABLE COMPASS
+                  </div>
+                  <div className="text-[10px] text-white/50 mt-1">Tap to allow motion sensor</div>
+                </div>
+              </button>
+            )}
+            {permission === "unsupported" && (
+              <div className="absolute bottom-2 text-[9px] text-white/40 tracking-widest">
+                SENSOR UNAVAILABLE
+              </div>
+            )}
           </div>
 
           <div className="glass-strong rounded-3xl p-3 flex-1 flex flex-col justify-between relative overflow-hidden">
