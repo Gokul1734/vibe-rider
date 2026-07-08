@@ -5,13 +5,15 @@ import {
 import { useEffect, useState } from "react";
 
 export function TopBar() {
-  const [time, setTime] = useState(new Date());
+  const [time, setTime] = useState<Date | null>(null);
   useEffect(() => {
+    setTime(new Date());
     const id = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
-  const hh = time.getHours().toString().padStart(2, "0");
-  const mm = time.getMinutes().toString().padStart(2, "0");
+  const hh = time ? time.getHours().toString().padStart(2, "0") : "--";
+  const mm = time ? time.getMinutes().toString().padStart(2, "0") : "--";
+
 
   return (
     <div className="flex items-center justify-between px-4 py-2 glass rounded-2xl">
