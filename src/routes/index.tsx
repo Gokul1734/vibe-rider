@@ -92,27 +92,21 @@ function Dashboard() {
           </div>
         </motion.section>
 
-        {/* Bottom row */}
+        {/* Bottom row — 5/7 split, no overlap */}
         <motion.section
           initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }}
-          className="col-span-4 row-span-2"
+          className="col-span-5 row-span-2"
         >
           <RideStats speed={speed} />
         </motion.section>
 
         <motion.section
           initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
-          className="col-span-5 row-span-2"
+          className="col-span-7 row-span-2"
         >
           <SpotifyPlayer />
         </motion.section>
 
-        <motion.section
-          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.25 }}
-          className="col-span-3 row-span-2"
-        >
-          <QuickControls />
-        </motion.section>
       </div>
     </div>
   );
