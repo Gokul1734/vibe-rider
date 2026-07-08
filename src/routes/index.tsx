@@ -69,9 +69,9 @@ function Dashboard() {
           className="col-span-3 row-span-4 flex flex-col gap-3 min-h-0"
         >
           <div className="glass-strong rounded-3xl p-3 flex-1 flex flex-col items-center justify-center relative">
-            <div className="absolute top-3 left-4 text-[11px] tracking-[0.3em] text-white/50 font-display">COMPASS</div>
             <Compass heading={heading} />
           </div>
+
           <div className="glass-strong rounded-3xl p-3 flex-1 flex flex-col justify-between relative overflow-hidden">
             <div className="text-[11px] tracking-[0.3em] text-white/50 font-display">WEATHER</div>
             <div className="flex items-end justify-between">
