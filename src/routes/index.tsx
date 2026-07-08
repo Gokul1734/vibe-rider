@@ -48,11 +48,6 @@ function Dashboard() {
             <span className="text-[10px] text-white/60 tracking-wider font-display">LIVE</span>
           </div>
           <Speedometer speed={speed} />
-          <div className="absolute bottom-3 left-3 right-3 flex justify-between text-[10px] text-white/50 font-mono">
-            <span>LIMIT · 80</span>
-            <span>MODE · SPORT</span>
-            <span>GEAR · 4</span>
-          </div>
         </motion.section>
 
         {/* Map */}
