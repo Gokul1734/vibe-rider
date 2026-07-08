@@ -6,8 +6,6 @@ import { MiniMap } from "@/features/maps/MiniMap";
 import { SpotifyPlayer } from "@/features/spotify/SpotifyPlayer";
 import { TopBar } from "@/features/dashboard/TopBar";
 import { RideStats } from "@/features/dashboard/RideStats";
-import { QuickControls } from "@/features/dashboard/QuickControls";
-void QuickControls;
 
 
 export const Route = createFileRoute("/")({
