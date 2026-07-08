@@ -48,11 +48,6 @@ function Dashboard() {
             <span className="text-[10px] text-white/60 tracking-wider font-display">LIVE</span>
           </div>
           <Speedometer speed={speed} />
-          <div className="absolute bottom-3 left-3 right-3 flex justify-between text-[10px] text-white/50 font-mono">
-            <span>LIMIT · 80</span>
-            <span>MODE · SPORT</span>
-            <span>GEAR · 4</span>
-          </div>
         </motion.section>
 
         {/* Map */}
@@ -97,7 +92,7 @@ function Dashboard() {
           initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }}
           className="col-span-5 row-span-2"
         >
-          <RideStats speed={speed} />
+          <RideStats />
         </motion.section>
 
         <motion.section
