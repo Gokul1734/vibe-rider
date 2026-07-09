@@ -1,11 +1,25 @@
-import { Wifi, WifiOff, Maximize2, Menu } from "lucide-react";
+import { Wifi, WifiOff, Maximize2, Sun, Moon, Monitor } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useOnlineStatus } from "@/lib/sensors";
+import { type ThemeMode, useTheme } from "@/hooks/use-theme";
+
+const themeLabels: Record<ThemeMode, string> = {
+  auto: "AUTO",
+  light: "DAY",
+  dark: "NIGHT",
+};
+
+function ThemeIcon({ mode }: { mode: ThemeMode }) {
+  if (mode === "auto") return <Monitor className="w-6 h-6" />;
+  if (mode === "light") return <Sun className="w-6 h-6" />;
+  return <Moon className="w-6 h-6" />;
+}
 
 export function TopBar() {
   const [time, setTime] = useState<Date | null>(null);
   const [mounted, setMounted] = useState(false);
   const online = useOnlineStatus();
+  const { mode, cycleMode } = useTheme();
 
   useEffect(() => {
     setMounted(true);
@@ -25,9 +39,13 @@ export function TopBar() {
     ampm = h24 >= 12 ? "PM" : "AM";
   }
   const dateLabel = time
-    ? time.toLocaleDateString(undefined, { weekday: "short", day: "2-digit", month: "short" })
+    ? time.toLocaleDateString(undefined, {
+        weekday: "long",
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      })
     : "";
-
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
@@ -35,55 +53,49 @@ export function TopBar() {
   };
 
   return (
-    <div className="flex items-center justify-between px-4 py-2 glass rounded-2xl">
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2">
-          <div
-            className="w-8 h-8 rounded-lg grid place-items-center"
-            style={{ background: "linear-gradient(135deg, var(--primary), transparent)" }}
-          >
-            <span className="font-display font-black text-black text-sm">R</span>
-          </div>
-          <div className="font-display font-bold tracking-widest text-sm text-white/90">
-            RIDEDECK
-          </div>
-        </div>
-        <div className="h-6 w-px bg-white/10" />
-        <div className="font-display font-bold text-2xl tabular-nums text-white text-glow-primary flex items-baseline gap-1">
+    <div className="flex items-center justify-between px-4 py-2 glass rounded-2xl shrink-0">
+      <div className="flex flex-col gap-0.5 min-w-0">
+        <div className="font-display font-black text-5xl sm:text-6xl lg:text-7xl tabular-nums text-foreground text-glow-primary flex items-baseline gap-1 leading-none">
           <span>{hh}</span>
-          <span className="opacity-60">:</span>
+          <span className="opacity-50">:</span>
           <span>{mm}</span>
-          <span className="text-xs text-white/60 tracking-widest ml-1">{ampm}</span>
+          <span className="text-xl sm:text-2xl panel-muted tracking-widest ml-2">{ampm}</span>
         </div>
-        <div className="text-[11px] tracking-widest uppercase text-white/50 font-display">
+        <div className="text-lg sm:text-xl lg:text-2xl tracking-wide uppercase panel-label font-display font-semibold truncate">
           {dateLabel}
         </div>
       </div>
 
-      <div className="flex items-center gap-3 text-white/70">
+      <div className="flex items-center gap-3 sm:gap-4 text-foreground shrink-0">
         {mounted && (
           <div
-            className={`flex items-center gap-1.5 text-xs font-medium tracking-wide ${
+            className={`flex items-center gap-2 text-base sm:text-lg font-semibold tracking-wide ${
               online ? "text-[var(--success)]" : "text-[var(--danger)]"
             }`}
           >
-            {online ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />}
-            <span className="tabular-nums">{online ? "ONLINE" : "OFFLINE"}</span>
+            {online ? <Wifi className="w-6 h-6" /> : <WifiOff className="w-6 h-6" />}
+            <span className="tabular-nums hidden sm:inline">{online ? "ONLINE" : "OFFLINE"}</span>
           </div>
         )}
 
         <button
+          onClick={cycleMode}
+          className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-foreground/5 border border-[var(--panel-border)]"
+          aria-label={`Theme: ${themeLabels[mode]}. Tap to switch.`}
+          title={`Theme: ${themeLabels[mode]}`}
+        >
+          <ThemeIcon mode={mode} />
+          <span className="font-display text-sm sm:text-base tracking-widest font-bold hidden sm:inline">
+            {themeLabels[mode]}
+          </span>
+        </button>
+
+        <button
           onClick={toggleFullscreen}
-          className="w-8 h-8 rounded-lg grid place-items-center hover:bg-white/5"
+          className="w-11 h-11 rounded-xl grid place-items-center hover:bg-foreground/5 border border-[var(--panel-border)]"
           aria-label="Toggle fullscreen"
         >
-          <Maximize2 className="w-4 h-4" />
-        </button>
-        <button
-          className="w-8 h-8 rounded-lg grid place-items-center hover:bg-white/5"
-          aria-label="Menu"
-        >
-          <Menu className="w-4 h-4" />
+          <Maximize2 className="w-6 h-6" />
         </button>
       </div>
     </div>

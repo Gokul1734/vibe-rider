@@ -117,6 +117,11 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var m=localStorage.getItem("vibe-rider-theme")||"auto";var h=new Date().getHours();var t=m==="light"?"light":m==="dark"?"dark":(h>=18||h<6)?"dark":"light";document.documentElement.classList.add(t);}catch(e){document.documentElement.classList.add("dark");}})();`,
+          }}
+        />
       </head>
       <body>
         {children}
