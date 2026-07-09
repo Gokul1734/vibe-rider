@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { Speedometer, useDemoSpeed } from "@/features/speedometer/Speedometer";
+import { Speedometer } from "@/features/speedometer/Speedometer";
 import { Compass } from "@/features/compass/Compass";
 import { MiniMap } from "@/features/maps/MiniMap";
 import { SpotifyPlayer } from "@/features/spotify/SpotifyPlayer";
 import { TopBar } from "@/features/dashboard/TopBar";
 import { RideStats } from "@/features/dashboard/RideStats";
 import { useDeviceHeading } from "@/lib/sensors";
+import { useGps } from "@/lib/gps";
+
 
 
 export const Route = createFileRoute("/")({
@@ -14,8 +16,11 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const speed = useDemoSpeed();
-  const { heading, permission, enable } = useDeviceHeading();
+  const gps = useGps();
+  const { heading: sensorHeading, permission, enable } = useDeviceHeading();
+  const heading = sensorHeading ?? gps.heading;
+  const speed = gps.speed;
+
 
   return (
     <div className="h-screen w-screen p-3 flex flex-col gap-3 overflow-hidden">
@@ -41,15 +46,37 @@ function Dashboard() {
         {/* Speedometer */}
         <motion.section
           initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-          className="col-span-4 row-span-4 glass-strong rounded-3xl p-3 flex items-center justify-center relative"
+          className="col-span-4 row-span-4 glass-strong rounded-3xl p-3 flex items-center justify-center relative overflow-hidden"
         >
           <div className="absolute top-3 left-4 text-[11px] tracking-[0.3em] text-white/50 font-display">SPEED</div>
           <div className="absolute top-3 right-4 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />
-            <span className="text-[10px] text-white/60 tracking-wider font-display">LIVE</span>
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${gps.active ? "bg-[var(--success)] animate-pulse" : "bg-white/30"}`}
+            />
+            <span className="text-[10px] text-white/60 tracking-wider font-display">
+              {gps.active ? "LIVE" : "GPS OFF"}
+            </span>
           </div>
           <Speedometer speed={speed} />
+          {gps.permission !== "granted" && (
+            <button
+              onClick={gps.enable}
+              className="absolute inset-0 grid place-items-center bg-black/60 backdrop-blur-sm text-center px-4"
+            >
+              <div>
+                <div className="font-display text-xs tracking-[0.3em] text-white/90">
+                  {gps.permission === "unsupported" ? "GPS UNAVAILABLE" : "ENABLE GPS"}
+                </div>
+                <div className="text-[10px] text-white/50 mt-1">
+                  {gps.permission === "denied"
+                    ? "Permission denied — enable in browser settings"
+                    : "Tap to allow location for live speed"}
+                </div>
+              </div>
+            </button>
+          )}
         </motion.section>
+
 
         {/* Map */}
         <motion.section
@@ -111,7 +138,7 @@ function Dashboard() {
           initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }}
           className="col-span-5 row-span-2"
         >
-          <RideStats />
+          <RideStats tripKm={gps.tripKm} rideSeconds={gps.rideSeconds} avgSpeed={gps.avgSpeed} onReset={gps.reset} />
         </motion.section>
 
         <motion.section
