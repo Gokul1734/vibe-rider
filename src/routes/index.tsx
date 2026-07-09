@@ -2,14 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { Speedometer } from "@/features/speedometer/Speedometer";
 import { Compass } from "@/features/compass/Compass";
-import { MiniMap } from "@/features/maps/MiniMap";
 import { SpotifyPlayer } from "@/features/spotify/SpotifyPlayer";
 import { TopBar } from "@/features/dashboard/TopBar";
 import { RideStats } from "@/features/dashboard/RideStats";
 import { useDeviceHeading } from "@/lib/sensors";
 import { useGps } from "@/lib/gps";
-
-
 
 export const Route = createFileRoute("/")({
   component: Dashboard,
@@ -21,35 +18,23 @@ function Dashboard() {
   const heading = sensorHeading ?? gps.heading;
   const speed = gps.speed;
 
-
   return (
-    <div className="h-screen w-screen p-3 flex flex-col gap-3 overflow-hidden">
-      {/* Orientation hint (portrait only) */}
-      <div className="landscape:hidden absolute inset-0 z-50 grid place-items-center bg-black/95 p-6 text-center">
-        <div>
-          <div className="mx-auto w-16 h-16 rounded-2xl glass-strong grid place-items-center mb-4">
-            <motion.div
-              animate={{ rotate: 90 }}
-              transition={{ repeat: Infinity, repeatType: "reverse", duration: 1.4 }}
-              className="w-8 h-12 rounded border-2 border-white/70"
-            />
-          </div>
-          <div className="font-display text-lg text-white">Rotate your device</div>
-          <div className="text-sm text-white/60 mt-1">Ridedeck is optimized for landscape mode.</div>
-        </div>
-      </div>
-
+    <div className="h-screen w-screen p-2 sm:p-3 flex flex-col gap-2 sm:gap-3 overflow-hidden">
       <TopBar />
 
-      {/* Main grid */}
-      <div className="flex-1 grid grid-cols-12 grid-rows-6 gap-3 min-h-0">
-        {/* Speedometer */}
+      {/* Main area — responsive: stacks on portrait mobile, row on landscape */}
+      <div className="flex-1 flex flex-col landscape:flex-row gap-2 sm:gap-3 min-h-0">
+        {/* Speedometer — 1:1 square, full height */}
         <motion.section
-          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-          className="col-span-4 row-span-4 glass-strong rounded-3xl p-3 flex items-center justify-center relative overflow-hidden"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="glass-strong rounded-3xl p-3 relative overflow-hidden shrink-0 flex items-center justify-center aspect-square landscape:h-full landscape:w-auto w-full max-w-full"
         >
-          <div className="absolute top-3 left-4 text-[11px] tracking-[0.3em] text-white/50 font-display">SPEED</div>
-          <div className="absolute top-3 right-4 flex items-center gap-1">
+          <div className="absolute top-3 left-4 text-[11px] tracking-[0.3em] text-white/50 font-display z-10">
+            SPEED
+          </div>
+          <div className="absolute top-3 right-4 flex items-center gap-1 z-10">
             <span
               className={`w-1.5 h-1.5 rounded-full ${gps.active ? "bg-[var(--success)] animate-pulse" : "bg-white/30"}`}
             />
@@ -57,7 +42,9 @@ function Dashboard() {
               {gps.active ? "LIVE" : "GPS OFF"}
             </span>
           </div>
-          <Speedometer speed={speed} />
+          <div className="w-full h-full flex items-center justify-center">
+            <Speedometer speed={speed} />
+          </div>
           {gps.permission !== "granted" && (
             <button
               onClick={gps.enable}
@@ -77,21 +64,29 @@ function Dashboard() {
           )}
         </motion.section>
 
-
-        {/* Map */}
+        {/* Middle column — Ride Stats */}
         <motion.section
-          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }}
-          className="col-span-5 row-span-4"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.05 }}
+          className="flex-1 min-h-0 min-w-0"
         >
-          <MiniMap />
+          <RideStats
+            tripKm={gps.tripKm}
+            rideSeconds={gps.rideSeconds}
+            avgSpeed={gps.avgSpeed}
+            onReset={gps.reset}
+          />
         </motion.section>
 
-        {/* Compass + weather stack */}
+        {/* Right column — Compass + Weather stacked */}
         <motion.section
-          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
-          className="col-span-3 row-span-4 flex flex-col gap-3 min-h-0"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="flex flex-col gap-2 sm:gap-3 min-h-0 landscape:w-56 xl:landscape:w-64 w-full"
         >
-          <div className="glass-strong rounded-3xl p-3 flex-1 flex flex-col items-center justify-center relative overflow-hidden">
+          <div className="glass-strong rounded-3xl p-3 flex-1 flex flex-col items-center justify-center relative overflow-hidden min-h-0">
             <Compass heading={heading ?? 0} />
             {(permission === "unknown" || permission === "denied") && (
               <button
@@ -113,42 +108,35 @@ function Dashboard() {
             )}
           </div>
 
-          <div className="glass-strong rounded-3xl p-3 flex-1 flex flex-col justify-between relative overflow-hidden">
+          <div className="glass-strong rounded-3xl p-3 flex-1 flex flex-col justify-between relative overflow-hidden min-h-0">
             <div className="text-[11px] tracking-[0.3em] text-white/50 font-display">WEATHER</div>
-            <div className="flex items-end justify-between">
+            <div className="flex items-end justify-between gap-2">
               <div>
-                <div className="font-display text-4xl font-bold text-white text-glow-accent">26°</div>
-                <div className="text-xs text-white/60">Feels 28° · Clear</div>
+                <div className="font-display text-3xl font-bold text-white text-glow-accent">26°</div>
+                <div className="text-[11px] text-white/60">Feels 28° · Clear</div>
               </div>
-              <div className="text-right text-[11px] text-white/60 space-y-0.5">
-                <div>Wind <span className="text-white">12 km/h</span></div>
+              <div className="text-right text-[10px] text-white/60 space-y-0.5">
+                <div>Wind <span className="text-white">12</span></div>
                 <div>Rain <span className="text-white">0%</span></div>
-                <div>Humidity <span className="text-white">54%</span></div>
               </div>
             </div>
             <div
-              className="pointer-events-none absolute -right-8 -top-8 w-40 h-40 rounded-full opacity-40"
+              className="pointer-events-none absolute -right-8 -top-8 w-32 h-32 rounded-full opacity-40"
               style={{ background: "radial-gradient(circle, var(--warning), transparent 70%)" }}
             />
           </div>
         </motion.section>
-
-        {/* Bottom row — 5/7 split, no overlap */}
-        <motion.section
-          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }}
-          className="col-span-5 row-span-2"
-        >
-          <RideStats tripKm={gps.tripKm} rideSeconds={gps.rideSeconds} avgSpeed={gps.avgSpeed} onReset={gps.reset} />
-        </motion.section>
-
-        <motion.section
-          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
-          className="col-span-7 row-span-2"
-        >
-          <SpotifyPlayer />
-        </motion.section>
-
       </div>
+
+      {/* Compact music player */}
+      <motion.section
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.15 }}
+        className="shrink-0"
+      >
+        <SpotifyPlayer />
+      </motion.section>
     </div>
   );
 }
