@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { Speedometer, useDemoSpeed } from "@/features/speedometer/Speedometer";
+import { Speedometer } from "@/features/speedometer/Speedometer";
 import { Compass } from "@/features/compass/Compass";
 import { MiniMap } from "@/features/maps/MiniMap";
 import { SpotifyPlayer } from "@/features/spotify/SpotifyPlayer";
 import { TopBar } from "@/features/dashboard/TopBar";
 import { RideStats } from "@/features/dashboard/RideStats";
 import { useDeviceHeading } from "@/lib/sensors";
+import { useGps } from "@/lib/gps";
+
 
 
 export const Route = createFileRoute("/")({
