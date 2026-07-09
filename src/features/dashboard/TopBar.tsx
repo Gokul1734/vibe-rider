@@ -1,7 +1,10 @@
 import { Wifi, WifiOff, Maximize2, Sun, Moon, Monitor } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useOnlineStatus } from "@/lib/sensors";
+import { useDeviceHeading, useOnlineStatus } from "@/lib/sensors";
 import { type ThemeMode, useTheme } from "@/hooks/use-theme";
+import { Compass } from "../compass/Compass";
+import { motion } from "motion/react";
+import { WeatherWidget } from "./WeatherWidget";
 
 const themeLabels: Record<ThemeMode, string> = {
   auto: "AUTO",
@@ -20,6 +23,7 @@ export function TopBar() {
   const [mounted, setMounted] = useState(false);
   const online = useOnlineStatus();
   const { mode, cycleMode } = useTheme();
+  const { heading, permission, enable } = useDeviceHeading();
 
   useEffect(() => {
     setMounted(true);
@@ -47,13 +51,8 @@ export function TopBar() {
       })
     : "";
 
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
-    else document.exitFullscreen?.().catch(() => {});
-  };
-
   return (
-    <div className="flex items-center justify-between px-4 py-2 glass rounded-2xl shrink-0">
+    <div className="flex items-center justify-between gap-16 px-4 py-2 glass rounded-2xl shrink-0">
       <div className="flex flex-col gap-0.5 min-w-0">
         <div className="font-display font-black text-5xl sm:text-6xl lg:text-7xl tabular-nums text-foreground text-glow-primary flex items-baseline gap-1 leading-none">
           <span>{hh}</span>
@@ -67,35 +66,37 @@ export function TopBar() {
       </div>
 
       <div className="flex items-center gap-3 sm:gap-4 text-foreground shrink-0">
-        {mounted && (
-          <div
-            className={`flex items-center gap-2 text-base sm:text-lg font-semibold tracking-wide ${
-              online ? "text-[var(--success)]" : "text-[var(--danger)]"
-            }`}
-          >
-            {online ? <Wifi className="w-6 h-6" /> : <WifiOff className="w-6 h-6" />}
-            <span className="tabular-nums hidden sm:inline">{online ? "ONLINE" : "OFFLINE"}</span>
-          </div>
-        )}
-
+        <div className="glass-strong rounded-2xl p-2 sm:p-3 relative">
+          <Compass heading={heading ?? 0} compact />
+          {(permission === "unknown" || permission === "denied") && (
+            <button
+              onClick={enable}
+              className="absolute inset-0 rounded-2xl grid place-items-center bg-black/60 backdrop-blur-sm text-center px-2"
+            >
+              <div>
+                <div className="font-display text-xs tracking-[0.2em] text-white/90 font-bold">
+                  ENABLE COMPASS
+                </div>
+              </div>
+            </button>
+          )}
+          {permission === "unsupported" && (
+            <div className="absolute -bottom-5 left-0 right-0 text-[10px] panel-muted tracking-widest text-center">
+              SENSOR UNAVAILABLE
+            </div>
+          )}
+        </div>
+        <WeatherWidget />
         <button
           onClick={cycleMode}
-          className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-foreground/5 border border-[var(--panel-border)]"
+          className="flex items-center gap-2 px-12 py-18 rounded-xl hover:bg-foreground/5 border border-[var(--panel-border)]"
           aria-label={`Theme: ${themeLabels[mode]}. Tap to switch.`}
           title={`Theme: ${themeLabels[mode]}`}
         >
           <ThemeIcon mode={mode} />
-          <span className="font-display text-sm sm:text-base tracking-widest font-bold hidden sm:inline">
+          <span className="font-display text-2xl sm:text-base tracking-widest font-bold hidden sm:inline">
             {themeLabels[mode]}
           </span>
-        </button>
-
-        <button
-          onClick={toggleFullscreen}
-          className="w-11 h-11 rounded-xl grid place-items-center hover:bg-foreground/5 border border-[var(--panel-border)]"
-          aria-label="Toggle fullscreen"
-        >
-          <Maximize2 className="w-6 h-6" />
         </button>
       </div>
     </div>

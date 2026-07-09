@@ -66,17 +66,56 @@ export function Compass({ heading, compact = false }: Props) {
       </motion.svg>
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="flex flex-col items-center">
-          <div className="w-[3px] h-[38%] bg-gradient-to-t from-transparent via-[var(--primary)] to-[var(--primary)] rounded-full shadow-[0_0_10px_var(--primary)]" />
+          <div className="w-[3px] h-[30%] bg-gradient-to-t from-transparent via-[var(--primary)] to-[var(--primary)] rounded-full shadow-[0_0_10px_var(--primary)]" />
         </div>
       </div>
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="text-center translate-y-5">
-          <div className="font-display text-xl font-bold text-foreground text-glow-primary">
-            {cardinal}
-          </div>
-          <div className="font-mono text-sm panel-muted font-semibold">{Math.round(heading)}°</div>
-        </div>
+       <motion.div
+         className="relative w-2 h-16 origin-center"
+         animate={{ rotate: heading }}
+         transition={{
+           type: "spring",
+           stiffness: 80,
+           damping: 16,
+         }}
+       >
+         {/* North (Red) */}
+         <div
+           className="absolute left-1/2 -translate-x-1/2 top-0"
+           style={{
+             width: 0,
+             height: 0,
+             borderLeft: "6px solid transparent",
+             borderRight: "6px solid transparent",
+             borderBottom: "38px solid #ff3b30",
+             filter: "drop-shadow(0 0 6px #ff3b30)",
+           }}
+         />
+
+         {/* South (White) */}
+         <div
+           className="absolute left-1/2 -translate-x-1/2 bottom-0"
+           style={{
+             width: 0,
+             height: 0,
+             borderLeft: "6px solid transparent",
+             borderRight: "6px solid transparent",
+             borderTop: "28px solid #ffffff",
+           }}
+         />
+
+         {/* Center Pivot */}
+         <div
+           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+                      w-4 h-4 rounded-full border-2 border-white"
+           style={{
+             background: "var(--primary)",
+             boxShadow: "0 0 12px var(--primary)",
+           }}
+         />
+       </motion.div>
+     </div>
+
       </div>
-    </div>
   );
 }

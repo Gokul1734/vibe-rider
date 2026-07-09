@@ -1,6 +1,6 @@
 export function WeatherWidget() {
   return (
-    <div className="glass-strong rounded-2xl p-3 sm:p-4 w-[140px] sm:w-[160px]">
+    <div className="glass-strong rounded-2xl p-3 sm:p-6 w-[220px] sm:w-[300px]">
       <div className="text-xs sm:text-sm tracking-[0.3em] panel-label font-display font-semibold mb-2">
         WEATHER
       </div>

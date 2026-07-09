@@ -14,7 +14,7 @@ export const Route = createFileRoute("/")({
 
 function Dashboard() {
   const gps = useGps();
-  const { heading: sensorHeading, permission, enable } = useDeviceHeading();
+  const { heading: sensorHeading } = useDeviceHeading();
   const heading = sensorHeading ?? gps.heading;
   const speed = gps.speed;
 
@@ -80,45 +80,6 @@ function Dashboard() {
             onReset={gps.reset}
           />
         </motion.section>
-
-        {/* Bottom-left overlay — Compass on top of speedometer */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-          className="absolute bottom-3 left-3 z-20 pointer-events-auto"
-        >
-          <div className="glass-strong rounded-2xl p-2 sm:p-3 relative">
-            <Compass heading={heading ?? 0} compact />
-            {(permission === "unknown" || permission === "denied") && (
-              <button
-                onClick={enable}
-                className="absolute inset-0 rounded-2xl grid place-items-center bg-black/60 backdrop-blur-sm text-center px-2"
-              >
-                <div>
-                  <div className="font-display text-xs tracking-[0.2em] text-white/90 font-bold">
-                    ENABLE COMPASS
-                  </div>
-                </div>
-              </button>
-            )}
-            {permission === "unsupported" && (
-              <div className="absolute -bottom-5 left-0 right-0 text-[10px] panel-muted tracking-widest text-center">
-                SENSOR UNAVAILABLE
-              </div>
-            )}
-          </div>
-        </motion.div>
-
-        {/* Bottom-right overlay — Weather on top of ride stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.12 }}
-          className="absolute bottom-3 right-3 z-20 pointer-events-auto"
-        >
-          <WeatherWidget />
-        </motion.div>
       </div>
     </div>
   );
