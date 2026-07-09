@@ -87,7 +87,7 @@ function Dashboard() {
           </div>
   
           {/* GPS Permission Overlay */}
-          {gps.permission !== "granted" && (
+          {/* {gps.permission !== "granted" && (
             <button
               onClick={gps.enable}
               className="absolute inset-0 bg-black/60 backdrop-blur-sm grid place-items-center z-30"
@@ -106,7 +106,7 @@ function Dashboard() {
                 </div>
               </div>
             </button>
-          )}
+          )} */}
   
         </motion.section>
   
