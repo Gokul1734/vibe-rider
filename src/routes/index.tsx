@@ -138,7 +138,7 @@ function Dashboard() {
           initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }}
           className="col-span-5 row-span-2"
         >
-          <RideStats />
+          <RideStats tripKm={gps.tripKm} rideSeconds={gps.rideSeconds} avgSpeed={gps.avgSpeed} onReset={gps.reset} />
         </motion.section>
 
         <motion.section
