@@ -81,6 +81,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "A premium motorcycle TFT dashboard for your phone. Speed, navigation, music and ride analytics — glanceable in 0.5 seconds." },
       { name: "author", content: "Ridedeck" },
       { name: "theme-color", content: "#000000" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "Ridedeck" },
       { property: "og:title", content: "Clustrix" },
       { property: "og:description", content: "A premium motorcycle TFT dashboard for your phone. Speed, navigation, music and ride analytics — glanceable in 0.5 seconds." },
       { property: "og:type", content: "website" },
@@ -92,10 +96,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "icon", type: "image/png", href: "/app-icon.png" },
+      { rel: "apple-touch-icon", href: "/app-icon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" },
     ],
+
   }),
 
   shellComponent: RootShell,
