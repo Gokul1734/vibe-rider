@@ -49,10 +49,11 @@ export function TopBar() {
           </div>
         </div>
         <div className="h-6 w-px bg-white/10" />
-        <div className="font-display font-bold text-2xl tabular-nums text-white text-glow-primary">
-          {hh}
-          <span className="opacity-60 mx-0.5">:</span>
-          {mm}
+        <div className="font-display font-bold text-2xl tabular-nums text-white text-glow-primary flex items-baseline gap-1">
+          <span>{hh}</span>
+          <span className="opacity-60">:</span>
+          <span>{mm}</span>
+          <span className="text-xs text-white/60 tracking-widest ml-1">{ampm}</span>
         </div>
         <div className="text-[11px] tracking-widest uppercase text-white/50 font-display">
           {dateLabel}
@@ -60,14 +61,17 @@ export function TopBar() {
       </div>
 
       <div className="flex items-center gap-3 text-white/70">
-        <div
-          className={`flex items-center gap-1.5 text-xs font-medium tracking-wide ${
-            online ? "text-[var(--success)]" : "text-[var(--danger)]"
-          }`}
-        >
-          {online ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />}
-          <span className="tabular-nums">{online ? "ONLINE" : "OFFLINE"}</span>
-        </div>
+        {mounted && (
+          <div
+            className={`flex items-center gap-1.5 text-xs font-medium tracking-wide ${
+              online ? "text-[var(--success)]" : "text-[var(--danger)]"
+            }`}
+          >
+            {online ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />}
+            <span className="tabular-nums">{online ? "ONLINE" : "OFFLINE"}</span>
+          </div>
+        )}
+
         <button
           onClick={toggleFullscreen}
           className="w-8 h-8 rounded-lg grid place-items-center hover:bg-white/5"
