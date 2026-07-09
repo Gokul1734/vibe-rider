@@ -1,16 +1,47 @@
 import { Route, Timer, Gauge } from "lucide-react";
+import { formatRideTime } from "@/lib/gps";
 
-export function RideStats() {
+interface Props {
+  tripKm: number;
+  rideSeconds: number;
+  avgSpeed: number;
+  onReset?: () => void;
+}
+
+export function RideStats({ tripKm, rideSeconds, avgSpeed, onReset }: Props) {
   const stats = [
-    { icon: Route, label: "Trip", value: "128.4", unit: "km", color: "var(--primary)" },
-    { icon: Timer, label: "Ride Time", value: "02:47", unit: "", color: "var(--accent)" },
-    { icon: Gauge, label: "Avg Speed", value: "68", unit: "km/h", color: "var(--success)" },
+    {
+      icon: Route,
+      label: "Trip",
+      value: tripKm.toFixed(tripKm < 100 ? 1 : 0),
+      unit: "km",
+      color: "var(--primary)",
+    },
+    {
+      icon: Timer,
+      label: "Ride Time",
+      value: formatRideTime(rideSeconds),
+      unit: "",
+      color: "var(--accent)",
+    },
+    {
+      icon: Gauge,
+      label: "Avg Speed",
+      value: Math.round(avgSpeed).toString(),
+      unit: "km/h",
+      color: "var(--success)",
+    },
   ];
   return (
     <div className="glass-strong rounded-3xl p-4 h-full flex flex-col">
       <div className="flex items-center justify-between mb-4 px-1">
         <div className="text-[11px] tracking-[0.35em] text-white/50 font-display">RIDE STATS</div>
-        <button className="text-[10px] tracking-widest text-[var(--primary)] hover:underline">RESET</button>
+        <button
+          onClick={onReset}
+          className="text-[10px] tracking-widest text-[var(--primary)] hover:underline"
+        >
+          RESET
+        </button>
       </div>
       <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
         {stats.map((s) => (
