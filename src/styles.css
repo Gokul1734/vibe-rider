@@ -129,7 +129,7 @@
 
 @layer base {
   * { border-color: var(--color-border); }
-  html, body, #root { height: 100%; }
+  html, body, #root { height: 100%; width: 100%; margin: 0; padding: 0; }
   body {
     background: radial-gradient(1200px 800px at 20% 10%, var(--body-gradient-1), transparent 60%),
                 radial-gradient(1200px 800px at 90% 90%, var(--body-gradient-2), transparent 60%),

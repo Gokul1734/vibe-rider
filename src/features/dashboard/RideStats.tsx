@@ -1,5 +1,8 @@
 import { Route, Timer, Gauge, RotateCcw } from "lucide-react";
 import { formatRideTime } from "@/lib/gps";
+import { Compass } from "../compass/Compass";
+import { useDeviceHeading } from "@/lib/sensors";
+import type { LucideIcon } from "lucide-react";
 
 interface Props {
   tripKm: number;
@@ -8,7 +11,48 @@ interface Props {
   onReset?: () => void;
 }
 
+interface StatRowProps {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  color: string;
+}
+
+function StatRow({
+  icon: Icon,
+  label,
+  value,
+  color,
+}: StatRowProps) {
+  return (
+    <div className="flex items-center gap-3">
+
+      <Icon
+        className="w-6 h-6 shrink-0"
+        style={{ color }}
+      />
+
+      <div className="flex-1">
+
+        <div className="text-xs uppercase tracking-widest panel-muted">
+          {label}
+        </div>
+
+        <div
+          className="font-display text-3xl font-bold"
+          style={{ color }}
+        >
+          {value}
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
+
 export function RideStats({ tripKm, rideSeconds, avgSpeed, onReset }: Props) {
+  const { heading } = useDeviceHeading();
   const stats = [
     {
       icon: Route,
@@ -34,44 +78,53 @@ export function RideStats({ tripKm, rideSeconds, avgSpeed, onReset }: Props) {
   ];
 
   return (
-    <div className="glass-strong rounded-3xl p-4 sm:p-5 h-full flex flex-col">
-      <div className="text-base sm:text-lg tracking-[0.35em] panel-label font-display font-semibold mb-4 px-1">
-        RIDE STATS
+    <div className="glass-strong rounded-3xl h-[280px] p-5 flex flex-col">
+  
+      {/* Content */}
+      <div className="flex flex-1 gap-4 min-h-0">
+  
+        {/* Stats */}
+        <div className="flex-1 flex flex-col justify-start space-y-2">
+  
+          <StatRow
+            icon={Route}
+            label="Trip"
+            value={`${tripKm.toFixed(1)} km`}
+            color="var(--primary)"
+          />
+  
+          <StatRow
+            icon={Timer}
+            label="Time"
+            value={formatRideTime(rideSeconds)}
+            color="var(--accent)"
+          />
+  
+          <StatRow
+            icon={Gauge}
+            label="Avg"
+            value={`${Math.round(avgSpeed)} km/h`}
+            color="var(--success)"
+          />
+  
+        </div>
+  
+        {/* Compass */}
+        <div className="w-36 flex items-end justify-center rounded-2xl">
+          <Compass heading={heading ?? 0} compact />
+        </div>
+  
       </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 flex-1 min-h-0">
-        {stats.map((s) => (
-          <div
-            key={s.label}
-            className="rounded-2xl border border-[var(--panel-border)] px-4 py-5 flex flex-col justify-between"
-            style={{ background: "var(--panel-inner)" }}
-          >
-            <div className="flex items-center gap-2 panel-muted text-sm sm:text-base tracking-[0.15em] font-semibold">
-              <s.icon className="w-6 h-6 shrink-0" style={{ color: s.color }} />
-              <span>{s.label.toUpperCase()}</span>
-            </div>
-            <div className="flex items-baseline gap-2 leading-none mt-3">
-              <div
-                className="font-display font-black text-5xl sm:text-6xl lg:text-7xl tabular-nums"
-                style={{ color: s.color, textShadow: `0 0 16px color-mix(in oklab, ${s.color} 50%, transparent)` }}
-              >
-                {s.value}
-              </div>
-              {s.unit && (
-                <div className="text-lg sm:text-xl panel-muted tracking-wide font-semibold">{s.unit}</div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-
+  
+      {/* Button */}
       <button
         onClick={onReset}
-        className="btn-cta mt-4 w-full py-4 sm:py-5 text-lg sm:text-xl flex items-center justify-center gap-3"
+        className="btn-cta mt-5 h-13 text-lg flex items-center justify-center gap-3"
       >
-        <RotateCcw className="w-6 h-6 sm:w-7 sm:h-7" />
+        <RotateCcw className="w-5 h-5" />
         RESET TRIP
       </button>
+  
     </div>
   );
 }
