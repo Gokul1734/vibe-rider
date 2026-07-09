@@ -4,19 +4,30 @@ import { useOnlineStatus } from "@/lib/sensors";
 
 export function TopBar() {
   const [time, setTime] = useState<Date | null>(null);
+  const [mounted, setMounted] = useState(false);
   const online = useOnlineStatus();
 
   useEffect(() => {
+    setMounted(true);
     setTime(new Date());
     const id = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
 
-  const hh = time ? time.getHours().toString().padStart(2, "0") : "--";
-  const mm = time ? time.getMinutes().toString().padStart(2, "0") : "--";
+  let hh = "--";
+  let mm = "--";
+  let ampm = "";
+  if (time) {
+    const h24 = time.getHours();
+    const h12 = h24 % 12 || 12;
+    hh = h12.toString().padStart(2, "0");
+    mm = time.getMinutes().toString().padStart(2, "0");
+    ampm = h24 >= 12 ? "PM" : "AM";
+  }
   const dateLabel = time
     ? time.toLocaleDateString(undefined, { weekday: "short", day: "2-digit", month: "short" })
     : "";
+
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
