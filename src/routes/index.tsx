@@ -46,15 +46,37 @@ function Dashboard() {
         {/* Speedometer */}
         <motion.section
           initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-          className="col-span-4 row-span-4 glass-strong rounded-3xl p-3 flex items-center justify-center relative"
+          className="col-span-4 row-span-4 glass-strong rounded-3xl p-3 flex items-center justify-center relative overflow-hidden"
         >
           <div className="absolute top-3 left-4 text-[11px] tracking-[0.3em] text-white/50 font-display">SPEED</div>
           <div className="absolute top-3 right-4 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />
-            <span className="text-[10px] text-white/60 tracking-wider font-display">LIVE</span>
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${gps.active ? "bg-[var(--success)] animate-pulse" : "bg-white/30"}`}
+            />
+            <span className="text-[10px] text-white/60 tracking-wider font-display">
+              {gps.active ? "LIVE" : "GPS OFF"}
+            </span>
           </div>
           <Speedometer speed={speed} />
+          {gps.permission !== "granted" && (
+            <button
+              onClick={gps.enable}
+              className="absolute inset-0 grid place-items-center bg-black/60 backdrop-blur-sm text-center px-4"
+            >
+              <div>
+                <div className="font-display text-xs tracking-[0.3em] text-white/90">
+                  {gps.permission === "unsupported" ? "GPS UNAVAILABLE" : "ENABLE GPS"}
+                </div>
+                <div className="text-[10px] text-white/50 mt-1">
+                  {gps.permission === "denied"
+                    ? "Permission denied — enable in browser settings"
+                    : "Tap to allow location for live speed"}
+                </div>
+              </div>
+            </button>
+          )}
         </motion.section>
+
 
         {/* Map */}
         <motion.section
