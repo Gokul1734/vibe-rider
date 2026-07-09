@@ -16,8 +16,11 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const speed = useDemoSpeed();
-  const { heading, permission, enable } = useDeviceHeading();
+  const gps = useGps();
+  const { heading: sensorHeading, permission, enable } = useDeviceHeading();
+  const heading = sensorHeading ?? gps.heading;
+  const speed = gps.speed;
+
 
   return (
     <div className="h-screen w-screen p-3 flex flex-col gap-3 overflow-hidden">
