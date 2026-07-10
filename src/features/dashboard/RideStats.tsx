@@ -1,13 +1,13 @@
 import { Route, Timer, Gauge, RotateCcw } from "lucide-react";
 import { formatRideTime } from "@/lib/gps";
 import { Compass } from "../compass/Compass";
-import { useDeviceHeading } from "@/lib/sensors";
 import type { LucideIcon } from "lucide-react";
 
 interface Props {
   tripKm: number;
   rideSeconds: number;
   avgSpeed: number;
+  heading: number;
   onReset?: () => void;
 }
 
@@ -51,8 +51,7 @@ function StatRow({
   );
 }
 
-export function RideStats({ tripKm, rideSeconds, avgSpeed, onReset }: Props) {
-  const { heading } = useDeviceHeading();
+export function RideStats({ tripKm, rideSeconds, avgSpeed, heading, onReset }: Props) {
   const stats = [
     {
       icon: Route,
@@ -111,7 +110,7 @@ export function RideStats({ tripKm, rideSeconds, avgSpeed, onReset }: Props) {
   
         {/* Compass */}
         <div className="w-36 flex items-end justify-center rounded-2xl">
-          <Compass heading={heading ?? 0} compact />
+          <Compass heading={heading} compact />
         </div>
   
       </div>
