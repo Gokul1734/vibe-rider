@@ -63,9 +63,10 @@ export function Speedometer({ speed }: { speed: number }) {
       <div className="absolute inset-3 rounded-full glass-strong" />
 
       {/* Scale */}
-      <svg viewBox="0 0 200 200" className="absolute inset-0 -rotate-[135deg]">
+      <svg viewBox="0 0 200 200" className="absolute inset-0">
         {ticks.map((value) => {
-          const a = (value / MAX_SPEED) * 270;
+          // Sweep from 135° (lower-left, speed=0) clockwise 270° to 45° (lower-right, speed=max)
+          const a = 135 + (value / MAX_SPEED) * 270;
           const rad = (a * Math.PI) / 180;
           const major = value % 20 === 0;
           const outerRadius = 76;
@@ -90,7 +91,7 @@ export function Speedometer({ speed }: { speed: number }) {
         {ticks
           .filter((v) => v % 20 === 0)
           .map((value) => {
-            const a = (value / MAX_SPEED) * 270;
+            const a = 135 + (value / MAX_SPEED) * 270;
             const rad = (a * Math.PI) / 180;
             const x = 100 + Math.cos(rad) * 54;
             const y = 100 + Math.sin(rad) * 54;
@@ -105,7 +106,6 @@ export function Speedometer({ speed }: { speed: number }) {
                 fontWeight="700"
                 textAnchor="middle"
                 dominantBaseline="middle"
-                transform={`rotate(${135} ${x} ${y})`}
               >
                 {value}
               </text>
@@ -139,14 +139,14 @@ export function Speedometer({ speed }: { speed: number }) {
         />
       </div>
 
-      {/* Speed number — inside the ring, tucked into the lower-left dead zone
-          where the needle never rests. No KM/H label. */}
+      {/* Speed number — tucked into the bottom dead zone between the 0 and
+          MAX ticks, where the needle never sweeps. No KM/H label. */}
       <div className="absolute inset-0 pointer-events-none">
         <div
-          className="absolute left-[18%] bottom-[22%] font-display font-black leading-none tabular-nums"
+          className="absolute left-1/2 -translate-x-1/2 bottom-[8%] font-display font-black leading-none tabular-nums"
           style={{
             color,
-            fontSize: "clamp(3.5rem, 14vw, 8rem)",
+            fontSize: "clamp(2.5rem, 11vw, 6rem)",
             textShadow: `0 0 28px color-mix(in oklab, ${color} 70%, transparent)`,
             letterSpacing: "-0.04em",
           }}

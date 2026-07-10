@@ -46,6 +46,7 @@ function Dashboard() {
               tripKm={gps.tripKm}
               rideSeconds={gps.rideSeconds}
               avgSpeed={gps.avgSpeed}
+              heading={heading.heading ?? gps.heading ?? 0}
               onReset={gps.reset}
             />
           </motion.section>
