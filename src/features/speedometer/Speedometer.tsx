@@ -1,11 +1,15 @@
 import { motion, useSpring, useTransform } from "motion/react";
 import { useEffect } from "react";
+import { useSpeedBeep } from "@/lib/beep";
 
 const MAX_SPEED = 120;
 
 export function Speedometer({ speed }: { speed: number }) {
-  const pct = Math.min(1, Math.max(0, speed / MAX_SPEED));
+  const clamped = Math.min(MAX_SPEED, Math.max(0, speed));
+  const pct = clamped / MAX_SPEED;
   const angle = -135 + pct * 270;
+
+  useSpeedBeep(clamped, [50, 100]);
 
   const spring = useSpring(angle, {
     stiffness: 120,
@@ -20,9 +24,9 @@ export function Speedometer({ speed }: { speed: number }) {
   const rotate = useTransform(spring, (v) => `rotate(${v}deg)`);
 
   const color =
-    speed >= 80
+    clamped >= 100
       ? "var(--danger)"
-      : speed >= 40
+      : clamped >= 50
       ? "var(--primary)"
       : "var(--success)";
 
@@ -30,7 +34,6 @@ export function Speedometer({ speed }: { speed: number }) {
 
   return (
     <div className="relative aspect-square w-full h-full mx-auto">
-
       {/* Progress Ring */}
       <div
         className="absolute inset-0 rounded-full"
@@ -61,23 +64,16 @@ export function Speedometer({ speed }: { speed: number }) {
 
       {/* Scale */}
       <svg viewBox="0 0 200 200" className="absolute inset-0 -rotate-[135deg]">
-
-        {/* Tick Marks */}
         {ticks.map((value) => {
-          const angle = (value / MAX_SPEED) * 270;
-          const rad = (angle * Math.PI) / 180;
-
+          const a = (value / MAX_SPEED) * 270;
+          const rad = (a * Math.PI) / 180;
           const major = value % 20 === 0;
-
           const outerRadius = 76;
           const innerRadius = major ? 63 : 69;
-
           const x1 = 100 + Math.cos(rad) * outerRadius;
           const y1 = 100 + Math.sin(rad) * outerRadius;
-
           const x2 = 100 + Math.cos(rad) * innerRadius;
           const y2 = 100 + Math.sin(rad) * innerRadius;
-
           return (
             <line
               key={value}
@@ -85,27 +81,19 @@ export function Speedometer({ speed }: { speed: number }) {
               y1={y1}
               x2={x2}
               y2={y2}
-              stroke={
-                major
-                  ? "var(--speed-tick-major)"
-                  : "var(--speed-tick-minor)"
-              }
+              stroke={major ? "var(--speed-tick-major)" : "var(--speed-tick-minor)"}
               strokeWidth={major ? 2 : 1}
               strokeLinecap="round"
             />
           );
         })}
-
-        {/* Labels */}
         {ticks
           .filter((v) => v % 20 === 0)
           .map((value) => {
-            const angle = (value / MAX_SPEED) * 270;
-            const rad = (angle * Math.PI) / 180;
-
+            const a = (value / MAX_SPEED) * 270;
+            const rad = (a * Math.PI) / 180;
             const x = 100 + Math.cos(rad) * 54;
             const y = 100 + Math.sin(rad) * 54;
-
             return (
               <text
                 key={value}
@@ -125,13 +113,13 @@ export function Speedometer({ speed }: { speed: number }) {
           })}
       </svg>
 
-      {/* Needle */}
+      {/* Needle — sweeps 0..120 as before */}
       <motion.div
         className="absolute inset-0 flex items-center justify-center"
         style={{ transform: rotate }}
       >
         <div
-          className="h-[50%] w-[3px] -translate-y-[25%] rounded-full"
+          className="h-[48%] w-[3px] -translate-y-[24%] rounded-full"
           style={{
             background: `linear-gradient(to top, transparent, ${color})`,
             boxShadow: `0 0 18px ${color}`,
@@ -142,7 +130,7 @@ export function Speedometer({ speed }: { speed: number }) {
       {/* Hub */}
       <div className="absolute inset-0 flex items-center justify-center">
         <div
-          className="w-6 h-6 rounded-full border-2"
+          className="w-5 h-5 rounded-full border-2"
           style={{
             background: "var(--speed-hub-bg)",
             borderColor: "var(--speed-hub-border)",
@@ -151,20 +139,19 @@ export function Speedometer({ speed }: { speed: number }) {
         />
       </div>
 
-      {/* Speed */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none translate-y-[18%]">
+      {/* Speed number — inside the ring, tucked into the lower-left dead zone
+          where the needle never rests. No KM/H label. */}
+      <div className="absolute inset-0 pointer-events-none">
         <div
-          className="font-display font-black text-7xl sm:text-7xl lg:text-9xl leading-none tabular-nums"
+          className="absolute left-[18%] bottom-[22%] font-display font-black leading-none tabular-nums"
           style={{
             color,
-            textShadow: `0 0 24px color-mix(in oklab, ${color} 60%, transparent)`,
+            fontSize: "clamp(3.5rem, 14vw, 8rem)",
+            textShadow: `0 0 28px color-mix(in oklab, ${color} 70%, transparent)`,
+            letterSpacing: "-0.04em",
           }}
         >
-          {Math.round(speed).toString().padStart(2, "0")}
-        </div>
-
-        <div className="mt-2 text-lg tracking-[0.35em] panel-muted font-display font-bold">
-          KM/H
+          {Math.round(clamped).toString().padStart(2, "0")}
         </div>
       </div>
     </div>

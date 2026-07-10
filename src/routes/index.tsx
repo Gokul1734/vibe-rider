@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { Speedometer } from "@/features/speedometer/Speedometer";
-import { Compass } from "@/features/compass/Compass";
 import { TopBar } from "@/features/dashboard/TopBar";
 import { RideStats } from "@/features/dashboard/RideStats";
-import { WeatherWidget } from "@/features/dashboard/WeatherWidget";
-import { useDeviceHeading } from "@/lib/sensors";
 import { useGps } from "@/lib/gps";
+import { useWakeLock } from "@/lib/wake-lock";
+import { primeAudio } from "@/lib/beep";
+import { useDeviceHeading } from "@/lib/sensors";
 
 export const Route = createFileRoute("/")({
   component: Dashboard,
@@ -14,22 +14,28 @@ export const Route = createFileRoute("/")({
 
 function Dashboard() {
   const gps = useGps();
-  const { heading: sensorHeading } = useDeviceHeading();
-  const heading = sensorHeading ?? gps.heading;
-  const speed = gps.speed;
+  const heading = useDeviceHeading();
+  useWakeLock(true);
+
+  const handleEnable = async () => {
+    primeAudio();
+    gps.enable();
+    if (heading.permission !== "granted") {
+      try {
+        await heading.enable();
+      } catch {
+        /* noop */
+      }
+    }
+  };
 
   return (
     <div className="h-screen w-[106%] p-4 overflow-hidden">
-  
       <div className="grid h-full grid-cols-2 gap-2">
-  
         {/* ================= LEFT COLUMN ================= */}
         <div className="grid grid-rows-[100px_280px_100px] gap-3 min-h-0">
-  
-          {/* Top Bar */}
           <TopBar />
-  
-          {/* Ride Stats */}
+
           <motion.section
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -44,7 +50,7 @@ function Dashboard() {
             />
           </motion.section>
         </div>
-  
+
         {/* ================= RIGHT COLUMN ================= */}
         <motion.section
           initial={{ opacity: 0, y: 8 }}
@@ -52,66 +58,43 @@ function Dashboard() {
           transition={{ duration: 0.4 }}
           className="glass-strong rounded-3xl p-4 relative overflow-hidden flex flex-col"
         >
-          {/* Header */}
           <div className="flex items-center justify-between shrink-0">
-  
-            <h2 className="panel-label tracking-[0.3em]">
-              SPEED
-            </h2>
-  
+            <h2 className="panel-label tracking-[0.3em]">SPEED</h2>
             <div className="flex items-center gap-2">
               <span
                 className={`w-2.5 h-2.5 rounded-full ${
-                  gps.active
-                    ? "bg-[var(--success)] animate-pulse"
-                    : "bg-white/30"
+                  gps.active ? "bg-[var(--success)] animate-pulse" : "bg-white/30"
                 }`}
               />
-  
-              <span className="panel-muted">
-                {gps.active ? "LIVE" : "GPS OFF"}
-              </span>
+              <span className="panel-muted">{gps.active ? "LIVE" : "GPS OFF"}</span>
             </div>
-  
           </div>
-  
-          {/* Speedometer */}
+
           <div className="flex-1 flex items-center justify-center overflow-hidden">
-  
             <div className="h-full aspect-square flex items-center justify-center">
-  
-              <Speedometer speed={speed} />
-  
+              <Speedometer speed={gps.speed} />
             </div>
-  
           </div>
-  
-          {/* GPS Permission Overlay */}
-          {/* {gps.permission !== "granted" && (
+
+          {gps.permission !== "granted" && (
             <button
-              onClick={gps.enable}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm grid place-items-center z-30"
+              onClick={handleEnable}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm grid place-items-center z-30 rounded-3xl"
             >
-              <div className="text-center">
+              <div className="text-center px-6">
                 <div className="text-xl font-bold text-white tracking-wider">
-                  {gps.permission === "unsupported"
-                    ? "GPS UNAVAILABLE"
-                    : "ENABLE GPS"}
+                  {gps.permission === "unsupported" ? "GPS UNAVAILABLE" : "TAP TO START"}
                 </div>
-  
-                <div className="text-white/60 mt-2">
+                <div className="text-white/60 mt-2 text-sm">
                   {gps.permission === "denied"
-                    ? "Permission denied — enable in browser settings"
-                    : "Tap to allow location for live speed"}
+                    ? "Permission denied — enable location in browser settings"
+                    : "Allow location & motion access for live speed and compass"}
                 </div>
               </div>
             </button>
-          )} */}
-  
+          )}
         </motion.section>
-  
       </div>
-  
     </div>
   );
 }
