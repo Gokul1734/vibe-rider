@@ -146,7 +146,7 @@ export function Speedometer({ speed }: { speed: number }) {
           className="absolute left-1/2 -translate-x-1/2 bottom-[8%] font-display font-black leading-none tabular-nums"
           style={{
             color,
-            fontSize: "clamp(2.5rem, 11vw, 6rem)",
+            fontSize: "clamp(2.5rem, 9vw, 6rem)",
             textShadow: `0 0 28px color-mix(in oklab, ${color} 70%, transparent)`,
             letterSpacing: "-0.04em",
           }}
